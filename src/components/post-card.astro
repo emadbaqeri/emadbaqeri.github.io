@@ -1,0 +1,30 @@
+---
+import { format } from "date-fns";
+
+interface Props {
+    id: string;
+    title: string;
+    description: string;
+    publishDate: Date;
+}
+
+const { id, title, description, publishDate } = Astro.props;
+---
+
+<article>
+    <a href={`/posts/${id}`} class=" not-prose no-underline"> 
+        <div>
+            <header class="mb-4">
+                <h2 class="text-xl underline font-semibold mb-2 capitalize line-clamp-2">
+                    {title}
+                </h2>
+                <time datetime={publishDate.toISOString()} class="text-sm no-underline">
+                    {format(publishDate, "dd MMMM yyyy")}
+                </time>
+            </header>
+            <main>
+                <p class="capitalize line-clamp-3 no-underline">{description}</p>
+            </main>
+        </div>
+    </a>
+</article>

@@ -1,0 +1,58 @@
+---
+import "@styles/fonts.css";
+import { ClientRouter } from "astro:transitions";
+
+import Link from "@components/link.astro";
+import ThemeSwitch from "@components/theme-switch.astro";
+
+interface Props {
+    title: string;
+    description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="description" content={description} />
+        <link rel="icon" type="image/svg+xml" href="/me.png" />
+        <title>{title}</title>
+        <script>
+            const theme = localStorage.getItem("theme");
+            if (theme) {
+                document.documentElement.setAttribute("data-theme", theme);
+            }
+        </script>
+        <ClientRouter />
+    </head>
+
+    <body
+        class="prose dark:prose-invert prose-base lg:prose-lg xl:prose-xl 2xl:prose-2xl mx-auto px-4 md:px-0"
+    >
+        <header>
+            <div class="flex items-center justify-between py-5 lg:py-10">
+                <Link class="font-bold" href="/">Emad's Notes</Link>
+                <span class="flex gap-3">
+                    <Link
+                        size="small"
+                        target="_blank"
+                        href="https://x.com/emadbaqeri">Twitter (X)</Link
+                    >
+                    <Link
+                        size="small"
+                        target="_blank"
+                        href="https://github.com/emadbaqeri">GitHub</Link
+                    >
+                    <ThemeSwitch />
+                </span>
+            </div>
+        </header>
+        <main>
+            <slot />
+        </main>
+    </body>
+</html>

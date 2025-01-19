@@ -1,0 +1,31 @@
+---
+import Layout from "@layouts/app-layout.astro";
+import PostCard from "@components/post-card.astro";
+
+import { getCollection, type CollectionEntry } from "astro:content";
+
+const posts = (await getCollection("blog")) as Array<CollectionEntry<"blog">>;
+---
+
+<Layout
+    title="Emad's notes"
+    description="Personal development notes and insights from a self-taught developer exploring JavaScript, TypeScript, and Rust. Join me on my learning journey through web development and systems programming."
+>
+    <h1 class="not-prose text-2xl xl:text-3xl font-bold">
+        JavaScript, TypeScript, and Rust enthusiast. Building in public,
+        contributing to open source, and sharing my development journey
+    </h1>
+
+    <section class="mt-5 xl:mt-10 flex flex-col gap-5 lg:gap-10">
+        {
+            posts.map((post) => (
+                <PostCard
+                    id={post.id}
+                    title={post.data.title}
+                    description={post.data.description}
+                    publishDate={post.data.publishDate}
+                />
+            ))
+        }
+    </section>
+</Layout>

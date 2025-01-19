@@ -1,0 +1,25 @@
+---
+import Layout from "@layouts/app-layout.astro";
+import CopyToClipboard from "@components/copy-to-clipboard.astro";
+import { getCollection, render, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+    const posts = (await getCollection("blog")) as Array<
+        CollectionEntry<"blog">
+    >;
+    return posts.map((post) => {
+        return {
+            props: { post },
+            params: { id: post.id },
+        };
+    });
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+    <Content />
+    <CopyToClipboard />
+</Layout>

@@ -1,0 +1,226 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<template id="copyButtonTemplate">
+    <button
+        class="copy-button"
+        aria-label="Copy code to clipboard"
+        title="Copy code to clipboard"
+    >
+        <div class="icon-container">
+            <span class="icon icon-copy">
+                <Icon name="copy" />
+            </span>
+            <span class="icon icon-check">
+                <Icon name="check" />
+            </span>
+        </div>
+    </button>
+</template>
+
+<script>
+    interface CopyButtonElements {
+        button: HTMLButtonElement;
+    }
+
+    class CodeCopyManager {
+        private static readonly FEEDBACK_TIMEOUT = 2000;
+
+        private constructor() {}
+
+        static initialize(): void {
+            if (!navigator.clipboard) {
+                console.warn(
+                    "Clipboard API not supported - copy buttons disabled",
+                );
+                return;
+            }
+
+            const blocks = document.querySelectorAll<HTMLPreElement>("pre");
+            blocks.forEach((block) => this.setupCopyButton(block));
+        }
+
+        private static setupCopyButton(block: HTMLPreElement): void {
+            const elements = this.createElements();
+            if (!elements) return;
+
+            const { button } = elements;
+
+            this.styleCodeBlock(block);
+            this.attachElements(block, button);
+
+            button.addEventListener("click", () =>
+                this.handleCopy(block, button),
+            );
+        }
+
+        private static createElements(): CopyButtonElements | null {
+            const template = document.getElementById(
+                "copyButtonTemplate",
+            ) as HTMLTemplateElement;
+
+            if (!template) {
+                console.error("Required template not found");
+                return null;
+            }
+
+            return {
+                button: template.content.firstElementChild?.cloneNode(
+                    true,
+                ) as HTMLButtonElement,
+            };
+        }
+
+        private static styleCodeBlock(block: HTMLPreElement): void {
+            block.style.marginTop = "0";
+            block.style.paddingTop = "0";
+        }
+
+        private static attachElements(
+            block: HTMLPreElement,
+            button: HTMLButtonElement,
+        ): void {
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("code-buttons");
+            wrapper.appendChild(button);
+            block.parentNode?.insertBefore(wrapper, block);
+        }
+
+        private static async handleCopy(
+            block: HTMLPreElement,
+            button: HTMLButtonElement,
+        ): Promise<void> {
+            try {
+                const code = block.querySelector("code");
+                if (!code) {
+                    throw new Error("No code element found in pre block");
+                }
+
+                await navigator.clipboard.writeText(code.innerText);
+                this.showCopySuccess(button);
+            } catch (error) {
+                console.error("Copy failed:", error);
+                this.showCopyError(button);
+            }
+        }
+
+        private static showCopySuccess(button: HTMLButtonElement): void {
+            const iconContainer = button.querySelector(".icon-container");
+            if (iconContainer) {
+                iconContainer.classList.add("show-check");
+
+                setTimeout(() => {
+                    iconContainer.classList.remove("show-check");
+                }, this.FEEDBACK_TIMEOUT);
+            }
+        }
+
+        private static showCopyError(button: HTMLButtonElement): void {
+            button.classList.add("error");
+            setTimeout(
+                () => button.classList.remove("error"),
+                this.FEEDBACK_TIMEOUT,
+            );
+        }
+    }
+
+    document.addEventListener("astro:page-load", () => {
+        CodeCopyManager.initialize();
+    });
+</script>
+
+<style is:global>
+    .code-buttons {
+        position: relative;
+    }
+
+    .copy-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 100;
+        background: transparent;
+        border: none;
+        padding: 0.25rem;
+        transition: all 0.2s ease;
+        opacity: 0.6;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .copy-button:hover,
+    .copy-button:focus {
+        opacity: 1;
+        outline: none;
+    }
+
+    .copy-button svg {
+        height: 20px;
+        width: 20px;
+        /* Atom One Dark text color */
+        color: #abb2bf;
+        stroke: currentColor;
+        fill: none;
+        transition: all 0.2s ease;
+    }
+
+    .icon-container {
+        position: relative;
+        width: 20px;
+        height: 20px;
+    }
+
+    .icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            transform 0.3s ease,
+            opacity 0.3s ease;
+    }
+
+    .icon-copy {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    .icon-check {
+        transform: translateY(100%) rotate(-90deg);
+        opacity: 0;
+    }
+
+    /* Set the check icon color to Atom One Dark green */
+    .icon-check svg {
+        color: #98c379;
+    }
+
+    .icon-container.show-check .icon-copy {
+        transform: translateY(-100%) rotate(90deg);
+        opacity: 0;
+    }
+
+    .icon-container.show-check .icon-check {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    .copy-button.error svg {
+        color: #e06c75; /* Atom One Dark red */
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .copy-button,
+        .copy-button svg,
+        .icon,
+        .icon-container.show-check .icon-copy,
+        .icon-container.show-check .icon-check {
+            transition: none;
+        }
+    }
+</style>

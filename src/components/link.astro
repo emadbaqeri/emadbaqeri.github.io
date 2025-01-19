@@ -1,0 +1,31 @@
+---
+import { Icon } from "astro-icon/components";
+import type { HTMLAttributes } from "astro/types";
+
+interface ButtonProps extends HTMLAttributes<"a"> {
+    label?: string;
+    iconLeft: string;
+    iconRight: string;
+    size?: "small" | "medium" | "large";
+}
+
+const {
+    class: className,
+    iconLeft,
+    iconRight,
+    label,
+    size = "medium",
+    ...props
+} = Astro.props as ButtonProps;
+---
+
+<a class:list={[size, className]} {...props}>
+    {iconLeft && <Icon name={iconLeft} aria-hidden="true" />}
+    {
+        (label || Astro.slots.has("default")) && (
+            <span>{label || <slot />}</span>
+        )
+    }
+    {iconRight && <Icon name={iconRight} aria-hidden="true" />}
+</a>
+

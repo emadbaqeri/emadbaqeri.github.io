@@ -1,0 +1,89 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<button
+    id="theme-toggle"
+    class="w-8 h-8 flex items-center justify-center"
+    aria-label="Change color scheme"
+>
+    <Icon
+        color="currentColor"
+        class="dark:hidden inline transition-colors duration-300"
+        name="moon"
+    />
+    <Icon
+        color="currentColor"
+        class="hidden dark:inline transition-colors duration-300"
+        name="sun"
+    />
+</button>
+
+<style is:global>
+    *,
+    *::before,
+    *::after {
+        transition:
+            background-color 150ms ease,
+            color 150ms ease,
+            border-color 150ms ease,
+            fill 150ms ease,
+            stroke 150ms ease;
+    }
+
+    :root {
+        @apply bg-white text-black;
+    }
+
+    :root.dark {
+        @apply bg-gray-900 text-white;
+    }
+
+    /* Prevent transition on page load */
+    .no-transitions * {
+        transition: none !important;
+    }
+</style>
+
+<script>
+    function applyTheme(theme: 'dark' | 'light') {
+        if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    }
+
+    document.addEventListener("astro:page-load", () => {
+        document.documentElement.classList.add("no-transitions");
+
+        let theme: 'dark' | 'light' | null = localStorage.getItem("theme") as 'dark' | 'light' | null;
+
+        if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            localStorage.setItem("theme", theme);
+        }
+
+        applyTheme(theme);
+
+        requestAnimationFrame(() => {
+            document.documentElement.classList.remove("no-transitions");
+        });
+
+        const themeToggle = document.getElementById("theme-toggle");
+        if (themeToggle) {
+            themeToggle.addEventListener("click", () => {
+                const isDark = document.documentElement.classList.toggle("dark");
+                const newTheme: 'dark' | 'light' = isDark ? "dark" : "light";
+                localStorage.setItem("theme", newTheme);
+            });
+        }
+    });
+
+    document.addEventListener("astro:after-swap", () => {
+        const theme = localStorage.getItem("theme") as 'dark' | 'light' | null;
+        if (theme) { // Check if theme is not null
+            applyTheme(theme);
+        }
+    });
+</script>
