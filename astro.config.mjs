@@ -11,7 +11,7 @@ import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://emadbaqeri.github.io",
+  site: "https://emaaad.com",
   vite: {
     resolve: {
       alias: {
