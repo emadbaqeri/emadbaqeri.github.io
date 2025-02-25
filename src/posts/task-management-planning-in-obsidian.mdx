@@ -1,0 +1,66 @@
+---
+title: Task Management Planning in Obsidian
+publishDate: 2025-02-25
+description: How to plan and manage tasks effectively in Obsidian.
+---
+
+**I'm using `Tasks` Obsidian plugin
+
+We do have different metadata for each task:
+- 📆 Due Data: This is the date that the task must be done by
+- ⏳ Scheduled Date: This is the date that the task is scheduled be work on
+- 🛫 Start Date: This is the date that the task is available to start working on
+- ✅ Completed Date: This is the date that the task must be completed
+- ❌ Cancelled Date: Which is a date that the task has cancelled
+
+You can create a task or edit a task you've already created by `Tasks Modal Window`, which you can trigger from the command palette by:
+1. Pressing `Cmd + P`
+2. Typing `Tasks` in the command palette
+3. And then selecting `Tasks: Create or edit task` Option
+You can add date using natural language, even you can set repeating task by choosing and interval.
+
+You can also add `tags` to a task by including a hashtag symbol `#`, by using tags you add a lot of options how you filter tasks when you setup your tasks queries ;)
+
+Let's dive deep into the `Tasks` plugin settings and configure it properly based on your needs (in this case the settings are based on my needs 😁, but you can customize the settings however fits into your needs)
+
+- Task Format
+	1. Dataview, which you should use if you want to combine tasks and data view queries together
+	2. Tasks Emoji format, it looks better and I like it since I use lots of emojis in my task names and queries a lot
+- Global Task Filter
+	This lets you differentiate your tasks which will show up in queries and other checklist items in your Obsidian Vault, so you can define which lines are considered as tasks and which ones are just checklist items. I will set mine to `#todo`
+- Remove global filter from description
+	Since we've already defined the global task filter as `#todo` to denote which task should show up in my queries, I toggle this switch button on since I don't want to see the filter in the description of my task
+- Global Query
+	I leave it as is (maybe I will use this in the future)
+- Core Statuses and Custom Statuses
+	I leave it as is since the defaults suits my needs (maybe I will customize this in the feature)
+- Set created date on every added task
+	I would like to know when the task is created, since I'm following my own customized task management system, so I toggle this on
+- Set done date on every completed task
+	As the title suggests, it will create a timestamp for when the task status change to `Completed`
+- Set cancelled date on every cancelled task
+	As the title exposes, it will create a timestamp for when the task status changes to `Cancelled`. I delete the tasks which are cancelled so I don't toggle this on
+
+## Let's jump into the workflow
+
+The concept I'm following is ["Cal Newport Calls" multi-scale planning](https://dexa.ai/s/biWzFxp_). The whole idea of multi-scale planning is to organize your tasks into couple of different timescales
+- Quarterly
+- Weekly
+- Daily
+
+I use QuickAdd plugin inside obsidian to quickly add tasks and attach them to my notes.
+- First you install and enable the QuickAdd plugin
+- Go to the settings of the `QuickAdd` plugin and add a new `Capture Macro`
+- Make sure "Capture to active file" is off and set the file that you wanna capture the task too
+- Also add the following code to `Capture Format`
+
+```js quickadd
+return await this.app.plugins.plugins['obsidian-tasks-plugin'].apiV1.createTaskLineModal();
+```
+- One thing I would love to have is a hotkey for this macro
+- So, in the settings, go to the hotkeys and search for the `Capture Macro` you've added, in my case it's `New Task`
+- Then add to the plus button and press the hotkeys to be set (min is `option+command+n`)
+
+We have figured out, how to add tasks and it's time for diving queries for the tasks. queries are very cool tools to view your tasks.
+
+I'm going to make a separate blog post about querying tasks in Obsidian
