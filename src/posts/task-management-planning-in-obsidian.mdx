@@ -4,63 +4,77 @@ publishDate: 2025-02-25
 description: How to plan and manage tasks effectively in Obsidian.
 ---
 
-**I'm using `Tasks` Obsidian plugin
+Juggling tasks and projects can feel like herding cats, but when you pair Obsidian’s note-taking app with its powerhouse **Tasks plugin**, chaos gives way to clarity. In this guide, I’m sharing how I revamped my workflow using these tools—from setting up smart metadata to creating a planning system that adapts to your unique way of thinking. No strict rules here; it’s all about flexibility, customization, and even a touch of emoji magic.
 
-We do have different metadata for each task:
-- 📆 Due Data: This is the date that the task must be done by
-- ⏳ Scheduled Date: This is the date that the task is scheduled be work on
-- 🛫 Start Date: This is the date that the task is available to start working on
-- ✅ Completed Date: This is the date that the task must be completed
-- ❌ Cancelled Date: Which is a date that the task has cancelled
+### What You’ll Need
 
-You can create a task or edit a task you've already created by `Tasks Modal Window`, which you can trigger from the command palette by:
-1. Pressing `Cmd + P`
-2. Typing `Tasks` in the command palette
-3. And then selecting `Tasks: Create or edit task` Option
-You can add date using natural language, even you can set repeating task by choosing and interval.
+Let’s cover the essentials:
 
-You can also add `tags` to a task by including a hashtag symbol `#`, by using tags you add a lot of options how you filter tasks when you setup your tasks queries ;)
+- **Obsidian**: Already installed? Great. If not, download it for free at [obsidian.md](http://obsidian.md).
+- **Tasks Plugin**: The real star. Install it through Obsidian’s Community Plugins tab.
+- **Basic Obsidian Know-How**: A bit of familiarity with notes, links, and the command palette is useful, but I’ll walk you through everything else.
 
-Let's dive deep into the `Tasks` plugin settings and configure it properly based on your needs (in this case the settings are based on my needs 😁, but you can customize the settings however fits into your needs)
+Now that your toolkit is ready, let’s dive into what makes Tasks such a game-changer.
 
-- Task Format
-	1. Dataview, which you should use if you want to combine tasks and data view queries together
-	2. Tasks Emoji format, it looks better and I like it since I use lots of emojis in my task names and queries a lot
-- Global Task Filter
-	This lets you differentiate your tasks which will show up in queries and other checklist items in your Obsidian Vault, so you can define which lines are considered as tasks and which ones are just checklist items. I will set mine to `#todo`
-- Remove global filter from description
-	Since we've already defined the global task filter as `#todo` to denote which task should show up in my queries, I toggle this switch button on since I don't want to see the filter in the description of my task
-- Global Query
-	I leave it as is (maybe I will use this in the future)
-- Core Statuses and Custom Statuses
-	I leave it as is since the defaults suits my needs (maybe I will customize this in the feature)
-- Set created date on every added task
-	I would like to know when the task is created, since I'm following my own customized task management system, so I toggle this on
-- Set done date on every completed task
-	As the title suggests, it will create a timestamp for when the task status change to `Completed`
-- Set cancelled date on every cancelled task
-	As the title exposes, it will create a timestamp for when the task status changes to `Cancelled`. I delete the tasks which are cancelled so I don't toggle this on
+---
 
-## Let's jump into the workflow
+### Why Tasks? Less Friction, More Action
 
-The concept I'm following is ["Cal Newport Calls" multi-scale planning](https://dexa.ai/s/biWzFxp_). The whole idea of multi-scale planning is to organize your tasks into couple of different timescales
-- Quarterly
-- Weekly
-- Daily
+The Tasks plugin isn’t just about ticking boxes—it’s a **metadata ninja**. You can assign dates, track progress, and filter tasks with precision. Here’s how I use its core features:
 
-I use QuickAdd plugin inside obsidian to quickly add tasks and attach them to my notes.
-- First you install and enable the QuickAdd plugin
-- Go to the settings of the `QuickAdd` plugin and add a new `Capture Macro`
-- Make sure "Capture to active file" is off and set the file that you wanna capture the task too
-- Also add the following code to `Capture Format`
+- 📆 **Due Date** → “Finish this by Friday, or face the consequences.”
+- ⏳ **Scheduled Date** → “I’ll tackle this on Wednesday morning.”
+- 🛫 **Start Date** → “Don’t even think about me until March 1st.”
+- ✅ **Completed Date** → “Victory lap timestamp.”
+- ❌ **Cancelled Date** → “Nice try, but we’re letting this one go.”
 
-```js quickadd
-return await this.app.plugins.plugins['obsidian-tasks-plugin'].apiV1.createTaskLineModal();
-```
-- One thing I would love to have is a hotkey for this macro
-- So, in the settings, go to the hotkeys and search for the `Capture Macro` you've added, in my case it's `New Task`
-- Then add to the plus button and press the hotkeys to be set (min is `option+command+n`)
+**Pro Tip**: Press `Cmd/Ctrl + P`, type “Tasks,” and select **Create or edit task** to open a pop-up window. Using natural language like “every Monday” for recurring tasks just works like a charm.
 
-We have figured out, how to add tasks and it's time for diving queries for the tasks. queries are very cool tools to view your tasks.
+---
 
-I'm going to make a separate blog post about querying tasks in Obsidian
+### My Personal Setup (Steal Liberally)
+
+Tasks adapts to your workflow. Here’s my setup:
+
+1. **Task Format**:
+
+    - _Tasks Emoji Format_: Because life’s too short for boring lists.
+    - _Global Task Filter_: I use `#todo` to separate “real” tasks from casual checklists.
+    - _Remove Global Filter from Description_: This keeps everything neat and tidy.
+2. **Timestamps**:
+    - _Created Date_: Always on—I love knowing when an idea is born.
+    - _Done Date_: Automatically stamps a little victory.
+    - _Cancelled Date_: Turned off. If a task dies, I prefer not to leave a trace.
+3. **Statuses**: The default options cover Todo, In Progress, Done, and Cancelled perfectly.
+
+---
+
+### The Secret Sauce: Multi-Scale Planning
+
+Inspired by Cal Newport’s _Time Blocking_, I layer my planning across three horizons:
+
+1. **Quarterly**: Big-picture goals (e.g., “Launch course by Q3”).
+2. **Weekly**: A Sunday night ritual to map out the week’s battles.
+3. **Daily**: A morning coffee paired with a quick task triage.
+
+**QuickAdd Hack**: I supercharge task entry with the **QuickAdd plugin**. Here’s my setup:
+
+1. Install QuickAdd and create a **Capture Macro**.
+2. Configure it to skip the active file—this funnels tasks into a dedicated “Task Hub” note.
+3. Insert this code into the _Capture Format_:
+4.
+    ```
+    return await this.app.plugins.plugins['obsidian-tasks-plugin'].apiV1.createTaskLineModal();
+    ```
+5. Assign a hotkey (I use `Option + Command + N`). Now, adding tasks is faster than ever.
+---
+
+### What’s Next? Queries (Your Task Crystal Ball)
+
+Tasks truly shines when you harness **queries**—live filters that pull up exactly what you need when you need it. For example:
+
+- “Show me overdue #client tasks.”
+- “What’s scheduled for today?”
+- “Weekly review candidates.”
+
+I’ll leave queries for another day. **Want a deep dive on queries?**
