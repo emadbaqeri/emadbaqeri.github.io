@@ -1,0 +1,214 @@
+---
+title: Automating Code Quality in Nextjs, A Seamless Setup with Biome, Lefthook, and Commitlint
+publishDate: 2025-02-27
+description: Discover how to automate code quality in your Next.js projects using Biome for linting and formatting, Lefthook for git hooks, and Commitlint for structured commit messages. This guide provides a practical, seamless setup for maintaining a clean and consistent codebase.
+---
+
+After setting up a Next.js project in accordance with the provided documentation, I plan to select the default options for this application.
+
+```sh
+npx create-next-app@latest
+
+✔ What do you want to name your project? … static-code-analysis
+✔ Would you like to includeScript? … No / Yes
+✔ Would you like to add ESLint? … No / Yes
+✔ Would you like to implement Tailwind CSS? … No / Yes
+✔ Would you like to place your code in a `src/` directory? … No / Yes
+✔ Would you prefer to use App Router? (recommended) … No / Yes
+✔ Would you like to utilize Turbopack for `next dev`? … No / Yes
+✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes
+```
+
+I will utilize `biome` for comprehensive linting and formatting of the entire codebase, so let's proceed with the installation by following the instructions in the documentation.
+
+```sh
+pnpm add --save-dev --save-exact @biomejs/biome
+```
+
+Once the installation is complete, we need to run the command below to configure biome.
+
+```sh
+pnpm biome init
+```
+
+This command will generate a `biome.json` file in the project's root directory, which will contain the content shown below. We will modify the default settings soon to suit our requirements.
+
+```json
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"ignore": []
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	}
+}
+```
+
+Having successfully installed `biomejs`, we will now utilize the biome CLI for formatting and linting our code. Let's modify the `package.json` file to add these two scripts:
+
+```json
+{
+	"scripts": {
+		"lint": "pnpm biome lint --write .",
+		"format": "pnpm biome format --write ."
+	}
+}
+```
+
+Furthermore, we need to update the `biome.json` file to disregard files that our version control system—Git, in my case—excludes. To accomplish this, we enable the "vcs" option in the configuration and set `useIgnoreFile` to true.
+
+```json
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+```
+
+While the default rules will suffice for my projects, I will add one more rule to ensure consistent file naming: the `useFilenamingConvention` linting rule. The `biome.json` config file's linter object should currently appear as follows:
+
+```json
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	},
+```
+
+To ensure a uniform `kebab-case` naming for files throughout the project, we should modify this configuration as follows:
+
+```json
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"],
+            "strictCase": true,
+            "requireAscii": true
+          }
+        }
+      }
+    }
+  },
+```
+
+Let’s take a moment here – we've established our code quality tools, but that’s just part of the equation. These safeguards are only effective if we remember to use them. This is why **git hooks** transition from being technical details to crucial protection for your codebase. I've learned through experience that even the best linters can’t prevent human error—hence we are introducing **Lefthook** to automate our quality checks.
+
+Why choose Lefthook instead of other git hook managers? Three compelling reasons:
+
+1. **Incredible speed** (written in Go and executes hooks in parallel)
+2. **No dependencies** (no Node.js bloat for our hooks)
+3. **Straightforward configuration** (YAML files that anyone can grasp)
+
+Let's get to work:
+
+```sh
+pnpm add @evilmartians/lefthook --save-dev
+```
+
+Next, create a `lefthook.yml` file at the root of your project:
+
+```sh
+# The conductor of our quality orchestra
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      run: pnpm lint
+    format:
+      run: pnpm format
+
+commit-msg:
+  parallel: false
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}
+```
+
+This setup does something remarkable – each time you commit:
+
+1. **Pre-commit** (executed in parallel):
+    - `lint`: Automatically fix whatever Biome can address
+    - `format`: Correct any formatting issues
+2. **Commit-msg**:
+    - Ensures commit message structure using commitlint
+
+Now let’s address the **atomic commit** enforcer. Atomic commits are akin to single-ingredient meals – each commit should accomplish one clear task. No "fixed multiple issues" messages allowed!
+
+
+
+Install our commit message guardian:
+
+```
+pnpm add @commitlint/cli @commitlint/config-conventional --save-dev
+```
+
+Create the `commitlint.config.js` file:
+
+```
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [2, 'always', ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore']],
+    'subject-case': [2, 'always', 'lower-case']
+  }
+};
+```
+
+This configuration enforces:
+
+- Distinct commit types (feat/fix/docs/etc.)
+- Lowercase subjects
+- Structured message format
+
+Try committing with an invalid message:
+
+```
+git commit -m "save my work"
+# ⚠️ Fails with:
+# ✖   subject may not be empty [subject-empty]
+# ✖   type may not be empty [type-empty]
+```
+
+Now let's do it correctly:
+
+```
+git commit -m "chore: add commit message validation"
+# ✅ Green light to commit!
+```
+
+The real magic occurs when you combine these tools:
+
+1. Lefthook automatically triggers checks
+2. Biome refines your code
+3. Commitlint ensures meaningful commits
+4. Result: Each commit evolves into a reliable building block
+
+This setup isn't about creating red tape—it's focused on building muscle memory. After a week, you'll instinctively write improved commits and cleaner code. The best part? It scales wonderfully—when your team expands, these checks will become your collective standard for quality.
